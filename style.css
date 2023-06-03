@@ -1,3 +1,68 @@
-#root {
-  color: red;
+:root{
+  --text: black;
+  --bg: white;
+  --boxShadowCard: 0 0 1px rgb(24 35 52/8%),0 4px 50px rgba(99,110,140,.15);
+  --line: #e7e7e7;
 }
+
+html {
+  font-size: 16px;
+}
+
+
+* {
+  box-sizing: border-box;
+}
+
+ul {
+  padding: 0;
+  margin: 0;
+  list-style-type: none;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  margin: 0;
+}
+
+#root {
+  color: var(--text);
+  background-color: var(--bg);
+}
+
+.episodes {
+  padding: 24px;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.episodes_list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  justify-content: center;
+}
+
+.card {
+  flex: 1 1 auto;
+  min-width: 200px;
+  max-width: 260px;
+  box-shadow: var(--boxShadowCard);
+}
+
+.card_title {
+  padding: 16px;
+  min-height: 76px;
+}
+
+.card_image {
+  display: inline-block;
+  width: 100%;
+  height: auto;
+}
+
+.card_descr {
+  padding: 16px;
+}
+
+
