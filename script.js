@@ -18,16 +18,25 @@ function makePageForEpisodes(episodes) {
   episodesList.classList.add('episodes_list');
   renderEpisodesItemsList(episodes,episodesList);
 
-  const search = createSearch(episodes);
+  // create episodes search form
+  const searchForm = createEpisodeSearchForm(episodes);
 
   //appends
-  [search].forEach(elem => episodesContainer.append(elem));
+  [searchForm].forEach(elem => episodesContainer.append(elem));
   [episodesList].forEach(elem => episodesContainer.append(elem));
   [episodesContainer].forEach(elem => rootElem.append(elem))
 }
 
-function createEpisodeOneCard (episodeInfo) {
-  const {name, season, number, image: {medium: imageUrl}, summary} = episodeInfo;
+function formatNumWithPadStart (num) {
+  return String(num).padStart(2, '0');
+}
+
+function getEpisodesSeasonAndNumberFormatted ({season, number}) {
+  return `S${formatNumWithPadStart(season)}E${formatNumWithPadStart(number)}`
+}
+
+function createEpisodeOneCard (episode) {
+  const {name, season, number, image: {medium: imageUrl}, summary} = episode;
 
   //create card
   const card = document.createElement('li');
@@ -36,7 +45,7 @@ function createEpisodeOneCard (episodeInfo) {
   //create title
   const title = document.createElement('div');
   title.classList.add('card_title');
-  const titleFormatted = `${name} - S${String(season).padStart(2, '0')}E${String(number).padStart(2, '0')}`;
+  const titleFormatted = `${name} - ${getEpisodesSeasonAndNumberFormatted({season, number})}`;
   title.innerHTML = `<h3>${titleFormatted}</h3>`
 
   //create image
@@ -57,24 +66,85 @@ function createEpisodeOneCard (episodeInfo) {
   return card;
 }
 
-function createSearch (episodes) {
+// SEARCH
+
+function createEpisodeSearchForm (episodes) {
+  // create episodes search form
+  const searchForm = document.createElement('form');
+  searchForm.id = 'episodeSearchForm';
+  const searchFormContent = document.createElement('div');
+  searchFormContent.classList.add('form_content');
+
+
+  const search = createEpisodesSearch(episodes) || {};
+  const select = createEpisodesSelect(episodes) || {};
   const allEpisodesQty = episodes.length;
-  let filteredEpisodesQty = allEpisodesQty;
+  const resultText = createEpisodesSearchResultText(allEpisodesQty);
+
+  //appends
+  [select, search, resultText].forEach(elem => searchFormContent.append(elem));
+  [searchFormContent].forEach(elem => searchForm.append(elem));
+
+  return searchForm;
+}
+function createEpisodesSelect (episodes) {
+  const selectContainer = document.createElement('div');
+  selectContainer.classList.add('select');
+
+  const select = document.createElement('select');
+  select.id = "episodesSelect";
+  select.name = "episodesSelect";
+  select.addEventListener('change', makeSelect(episodes))
+
+  function createSelectOption (episode){
+    const {name, season, number} = episode;
+    const nameAndSeason = getEpisodesSeasonAndNumberFormatted({season, number});
+    const titleFormatted = `${nameAndSeason} - ${name}`;
+    const option = document.createElement('option');
+    option.innerText = titleFormatted;
+    option.value = nameAndSeason;
+    return option;
+  }
+
+  function createSelectFirstOption (){
+    const option = document.createElement('option');
+    option.innerText = 'Select episode';
+    option.value = '';
+    option.selected = true;
+    return option;
+  }
+
+  select.append(createSelectFirstOption())
+
+  episodes.forEach(episode => {
+    const option = createSelectOption(episode);
+    select.append(option);
+  })
+
+  selectContainer.append(select);
+
+  return selectContainer;
+}
+function createEpisodesSearch (episodes) {
   const search = document.createElement('div');
   search.classList.add('search');
 
   const searchInput = document.createElement('input');
   searchInput.classList.add('search_input');
   searchInput.name = "episode";
+  searchInput.placeholder = 'Enter text for search';
   searchInput.addEventListener('input', makeSearch(episodes))
 
-  const searchText = document.createElement('span');
-  searchText.classList.add('search_text');
-  searchText.innerHTML = `Displaying <span id="filteredEpisodesQty">${filteredEpisodesQty}</span>/${allEpisodesQty} episodes`;
-
-  [searchInput, searchText].forEach(elem => search.append(elem));
+ search.append(searchInput);
 
   return search;
+}
+function createEpisodesSearchResultText (allEpisodesQty) {
+  const searchText = document.createElement('span');
+  const initialFilteredEpisodesQty = allEpisodesQty;
+  searchText.classList.add('search_text');
+  searchText.innerHTML = `Displaying <span id="filteredEpisodesQty">${initialFilteredEpisodesQty}</span>/${allEpisodesQty} episodes`;
+  return searchText;
 }
 
 function updateEpisodesList (episodes) {
@@ -97,6 +167,24 @@ function makeSearch (episodes) {
     const filteredEpisodesQtyElem = document.getElementById("filteredEpisodesQty");
     filteredEpisodesQtyElem.innerText = episodesFiltered.length;
     updateEpisodesList(episodesFiltered);
+  };
+}
+function makeSelect (episodes) {
+  return function (ev){
+    const value = ev.target.value;
+    const filteredEpisodesQtyElem = document.getElementById("filteredEpisodesQty");
+    if(value) {
+      const episodesFiltered = episodes.filter(episode => {
+        const {number, season} = episode;
+        const nameAndSeasonFormatted = getEpisodesSeasonAndNumberFormatted({season, number});
+        return value === nameAndSeasonFormatted;
+      });
+      filteredEpisodesQtyElem.innerText = episodesFiltered.length;
+      updateEpisodesList(episodesFiltered);
+    } else {
+      filteredEpisodesQtyElem.innerText = episodes.length;
+      updateEpisodesList(episodes);
+    }
   };
 }
 
