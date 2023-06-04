@@ -1,5 +1,6 @@
 :root{
-  --text: black;
+  --textPrimary: #222;
+  --textSecondary: #3e3e3e;
   --bg: white;
   --boxShadowCard: 0 0 1px rgb(24 35 52/8%),0 4px 50px rgba(99,110,140,.15);
   --line: #e7e7e7;
@@ -24,10 +25,13 @@ h1, h2, h3, h4, h5, h6 {
   margin: 0;
 }
 
-#root {
-  color: var(--text);
+body {
+  color: var(--textPrimary);
   background-color: var(--bg);
+  font-family: sans-serif;
 }
+
+#root {}
 
 .episodes {
   padding: 24px;
@@ -40,7 +44,6 @@ h1, h2, h3, h4, h5, h6 {
   display: flex;
   flex-wrap: wrap;
   gap: 24px;
-  justify-content: center;
 }
 
 .card {
@@ -63,6 +66,16 @@ h1, h2, h3, h4, h5, h6 {
 
 .card_descr {
   padding: 16px;
+}
+
+.search {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.search_Text {
+  color: var(--textSecondary);
 }
 
 
